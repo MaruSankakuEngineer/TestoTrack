@@ -200,144 +200,192 @@ class _MainPageState extends State<MainPage> {
           } else {
             return Stack(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      TableCalendar(
-                        firstDay: DateTime.utc(2020, 1, 1),
-                        lastDay: DateTime.utc(2100, 12, 31),
-                        focusedDay: _focusedDay,
-                        selectedDayPredicate: (day) => false,
-                        calendarBuilders: CalendarBuilders(
-                          defaultBuilder: (context, day, focusedDay) {
-                            final isEjaculationDay = ejaculationDates.any((date) => isSameDay(day, date));
-                            final level = getTestosteroneLevelForDate(day);
-                            Color color;
-                            if (level < 0.33) {
-                              color = Colors.redAccent;
-                            } else if (level < 0.66) {
-                              color = Colors.orangeAccent;
-                            } else {
-                              color = Colors.green;
-                            }
-                            return Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isEjaculationDay 
-                                    ? Colors.deepPurple 
-                                    : color.withOpacity(0.2),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                '${day.day}',
-                                style: TextStyle(
-                                  color: isEjaculationDay ? Colors.white : Colors.black,
-                                  fontWeight: isEjaculationDay ? FontWeight.bold : FontWeight.normal,
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TableCalendar(
+                          firstDay: DateTime.utc(2020, 1, 1),
+                          lastDay: DateTime.utc(2100, 12, 31),
+                          focusedDay: _focusedDay,
+                          selectedDayPredicate: (day) => false,
+                          calendarBuilders: CalendarBuilders(
+                            defaultBuilder: (context, day, focusedDay) {
+                              final isEjaculationDay = ejaculationDates.any((date) => isSameDay(day, date));
+                              final level = getTestosteroneLevelForDate(day);
+                              Color color;
+                              if (level < 0.33) {
+                                color = Colors.redAccent;
+                              } else if (level < 0.66) {
+                                color = Colors.orangeAccent;
+                              } else {
+                                color = Colors.green;
+                              }
+                              return Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: isEjaculationDay 
+                                      ? Colors.deepPurple 
+                                      : color.withOpacity(0.2),
                                 ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '${day.day}',
+                                  style: TextStyle(
+                                    color: isEjaculationDay ? Colors.white : Colors.black,
+                                    fontWeight: isEjaculationDay ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          onDaySelected: (selectedDay, focusedDay) {
+                            setState(() {
+                              _selectedDay = selectedDay;
+                              _focusedDay = focusedDay;
+                            });
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('発射記録'),
+                                content: Text('${selectedDay.year}/${selectedDay.month}/${selectedDay.day}に記録しますか？'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: const Text('キャンセル'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      setState(() {
+                                        ejaculationDates.add(selectedDay);
+                                      });
+                                      await _saveEjaculationDates();
+                                      if (mounted) {
+                                        Navigator.of(context).pop();
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: const Text('記録完了'),
+                                            content: const Text('記録が保存されました。'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.of(context).pop(),
+                                                child: const Text('OK'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: const Text('記録する'),
+                                  ),
+                                ],
                               ),
                             );
                           },
                         ),
-                        onDaySelected: (selectedDay, focusedDay) {
-                          setState(() {
-                            _selectedDay = selectedDay;
-                            _focusedDay = focusedDay;
-                          });
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('発射記録'),
-                              content: Text('${selectedDay.year}/${selectedDay.month}/${selectedDay.day}に記録しますか？'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  child: const Text('キャンセル'),
+                        const SizedBox(height: 16),
+                        Text(
+                          '発射日: ${lastEjaculationDate != null ? "${lastEjaculationDate!.year}/${lastEjaculationDate!.month}/${lastEjaculationDate!.day}" : "未記録"}',
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Colors.deepPurple,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('発射日'),
+                            const SizedBox(width: 24),
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('高'),
+                            const SizedBox(width: 24),
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Colors.orangeAccent.withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('中'),
+                            const SizedBox(width: 24),
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Colors.redAccent.withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('低'),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.deepPurple.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              const Text(
+                                'テストステロンレベルについて',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.deepPurple,
                                 ),
-                                TextButton(
-                                  onPressed: () async {
-                                    setState(() {
-                                      ejaculationDates.add(selectedDay);
-                                    });
-                                    await _saveEjaculationDates();
-                                    if (mounted) {
-                                      Navigator.of(context).pop();
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: const Text('記録完了'),
-                                          content: const Text('記録が保存されました。'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.of(context).pop(),
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: const Text('記録する'),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                '発射から日数が経つほど、テストステロンレベルは上昇します。\n'
+                                '高レベルを維持することで、より良い体調と精神状態を保つことができます。',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '発射日: ${lastEjaculationDate != null ? "${lastEjaculationDate!.year}/${lastEjaculationDate!.month}/${lastEjaculationDate!.day}" : "未記録"}',
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Colors.deepPurple,
-                              shape: BoxShape.circle,
-                            ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                '今月の発射回数: ${ejaculationDates.where((date) => date.year == DateTime.now().year && date.month == DateTime.now().month).length}回',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '前回の発射から: ${lastEjaculationDate != null ? DateTime.now().difference(lastEjaculationDate!).inDays : 0}日',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          const Text('発射日'),
-                          const SizedBox(width: 24),
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('高'),
-                          const SizedBox(width: 24),
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Colors.orangeAccent.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('中'),
-                          const SizedBox(width: 24),
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Colors.redAccent.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('低'),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Positioned(
