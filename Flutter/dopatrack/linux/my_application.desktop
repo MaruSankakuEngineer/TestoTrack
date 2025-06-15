@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=DopaTrack
+Comment=A dopamine tracking application
+Exec=dopatrack
+Icon=dopatrack
+Terminal=false
+Type=Application
+Categories=Utility; 
