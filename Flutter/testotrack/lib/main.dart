@@ -102,21 +102,33 @@ class _MainPageState extends State<MainPage> {
 
   // 指定日のテストステロンレベルを計算
   double getTestosteroneLevelForDate(DateTime date) {
-    if (ejaculationDates.isEmpty) return 1.0;
+    if (ejaculationDates.isEmpty) return 0.0;
 
-    // その日付以前の最新の発射日を探す
-    DateTime? lastDate;
-    for (var d in ejaculationDates.reversed) {
-      if (d.isBefore(date) || isSameDay(d, date)) {
-        lastDate = d;
-        break;
-      }
+    // その日以前の最も近い発射日を探す
+    var previousDates = ejaculationDates
+        .where((ejaculationDate) =>
+            ejaculationDate.isBefore(date) || isSameDay(ejaculationDate, date))
+        .toList();
+
+    if (previousDates.isEmpty) return 0.0;
+
+    DateTime lastEjaculationBeforeDate =
+        previousDates.reduce((a, b) => a.isAfter(b) ? a : b);
+
+    // 発射日からの経過日数を計算
+    int daysSinceEjaculation =
+        date.difference(lastEjaculationBeforeDate).inDays;
+
+    // 経過日数に基づいてテストステロンレベルを計算
+    if (daysSinceEjaculation <= 0) {
+      return 0.0; // 発射日当日は0
+    } else if (daysSinceEjaculation <= 3) {
+      return 0.3; // 3日以内は低
+    } else if (daysSinceEjaculation <= 7) {
+      return 0.6; // 7日以内は中
+    } else {
+      return 1.0; // 7日以上は高
     }
-
-    if (lastDate == null) return 1.0;
-    final days = date.difference(lastDate).inDays;
-    if (days >= 7) return 1.0;
-    return (days / 7).clamp(0.0, 1.0);
   }
 
   // 発射記録
@@ -213,7 +225,8 @@ class _MainPageState extends State<MainPage> {
                           selectedDayPredicate: (day) => false,
                           calendarBuilders: CalendarBuilders(
                             defaultBuilder: (context, day, focusedDay) {
-                              final isEjaculationDay = ejaculationDates.any((date) => isSameDay(day, date));
+                              final isEjaculationDay = ejaculationDates
+                                  .any((date) => isSameDay(day, date));
                               final level = getTestosteroneLevelForDate(day);
                               Color color;
                               if (level < 0.33) {
@@ -226,16 +239,20 @@ class _MainPageState extends State<MainPage> {
                               return Container(
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: isEjaculationDay 
-                                      ? Colors.deepPurple 
+                                  color: isEjaculationDay
+                                      ? Colors.deepPurple
                                       : color.withOpacity(0.2),
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   '${day.day}',
                                   style: TextStyle(
-                                    color: isEjaculationDay ? Colors.white : Colors.black,
-                                    fontWeight: isEjaculationDay ? FontWeight.bold : FontWeight.normal,
+                                    color: isEjaculationDay
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: isEjaculationDay
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
                                   ),
                                 ),
                               );
@@ -250,10 +267,12 @@ class _MainPageState extends State<MainPage> {
                               context: context,
                               builder: (context) => AlertDialog(
                                 title: const Text('発射記録'),
-                                content: Text('${selectedDay.year}/${selectedDay.month}/${selectedDay.day}に記録しますか？'),
+                                content: Text(
+                                    '${selectedDay.year}/${selectedDay.month}/${selectedDay.day}に記録しますか？'),
                                 actions: [
                                   TextButton(
-                                    onPressed: () => Navigator.of(context).pop(),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
                                     child: const Text('キャンセル'),
                                   ),
                                   TextButton(
@@ -271,7 +290,8 @@ class _MainPageState extends State<MainPage> {
                                             content: const Text('記録が保存されました。'),
                                             actions: [
                                               TextButton(
-                                                onPressed: () => Navigator.of(context).pop(),
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
                                                 child: const Text('OK'),
                                               ),
                                             ],
@@ -358,8 +378,8 @@ class _MainPageState extends State<MainPage> {
                               ),
                               const SizedBox(height: 8),
                               const Text(
-                                '発射から日数が経つほど、テストステロンレベルは上昇します。\n'
-                                '高レベルを維持することで、より良い体調と精神状態を保つことができます。',
+                                '発射から7日かけて、テストステロンレベルは最大値に近づきます。\n'
+                                '発射間隔をコントロールすることで、より良い体調と精神状態を保つことができます。',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 12,
