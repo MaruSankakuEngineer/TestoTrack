@@ -274,12 +274,20 @@ class _MainPageState extends State<MainPage> {
                               _selectedDay = selectedDay;
                               _focusedDay = focusedDay;
                             });
+
+                            // 選択された日が発射日かどうかを確認
+                            final isSelectedDayEjaculation = ejaculationDates
+                                .any((date) => isSameDay(date, selectedDay));
+
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: const Text('発射記録'),
-                                content: Text(
-                                    '${selectedDay.year}/${selectedDay.month}/${selectedDay.day}に記録しますか？'),
+                                title: Text(isSelectedDayEjaculation
+                                    ? '発射記録の削除'
+                                    : '発射記録'),
+                                content: Text(isSelectedDayEjaculation
+                                    ? '${selectedDay.year}/${selectedDay.month}/${selectedDay.day}の記録を削除しますか？'
+                                    : '${selectedDay.year}/${selectedDay.month}/${selectedDay.day}に記録しますか？'),
                                 actions: [
                                   TextButton(
                                     onPressed: () =>
@@ -289,7 +297,14 @@ class _MainPageState extends State<MainPage> {
                                   TextButton(
                                     onPressed: () async {
                                       setState(() {
-                                        ejaculationDates.add(selectedDay);
+                                        if (isSelectedDayEjaculation) {
+                                          // 発射日を削除
+                                          ejaculationDates.removeWhere((date) =>
+                                              isSameDay(date, selectedDay));
+                                        } else {
+                                          // 発射日を追加
+                                          ejaculationDates.add(selectedDay);
+                                        }
                                       });
                                       await _saveEjaculationDates();
                                       if (mounted) {
@@ -297,8 +312,13 @@ class _MainPageState extends State<MainPage> {
                                         showDialog(
                                           context: context,
                                           builder: (context) => AlertDialog(
-                                            title: const Text('記録完了'),
-                                            content: const Text('記録が保存されました。'),
+                                            title: Text(isSelectedDayEjaculation
+                                                ? '削除完了'
+                                                : '記録完了'),
+                                            content: Text(
+                                                isSelectedDayEjaculation
+                                                    ? '記録を削除しました。'
+                                                    : '記録が保存されました。'),
                                             actions: [
                                               TextButton(
                                                 onPressed: () =>
@@ -310,7 +330,9 @@ class _MainPageState extends State<MainPage> {
                                         );
                                       }
                                     },
-                                    child: const Text('記録する'),
+                                    child: Text(isSelectedDayEjaculation
+                                        ? '削除する'
+                                        : '記録する'),
                                   ),
                                 ],
                               ),
