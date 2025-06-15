@@ -254,22 +254,62 @@ class _MainPageState extends State<MainPage> {
                                 color = Colors.green.shade900; // ピーク
                               }
                               return Container(
+                                margin: const EdgeInsets.all(4.0),
                                 decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
                                   color: isEjaculationDay
                                       ? Colors.deepPurple
                                       : color.withOpacity(0.2),
+                                  shape: BoxShape.circle,
                                 ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  '${day.day}',
-                                  style: TextStyle(
-                                    color: isEjaculationDay
-                                        ? Colors.white
-                                        : textColor,
-                                    fontWeight: isEjaculationDay
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
+                                child: Center(
+                                  child: Text(
+                                    '${day.day}',
+                                    style: TextStyle(
+                                      color: isEjaculationDay
+                                          ? Colors.white
+                                          : textColor,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            todayBuilder: (context, day, focusedDay) {
+                              final isEjaculationDay = ejaculationDates
+                                  .any((date) => isSameDay(day, date));
+                              final level = getDopamineLevelForDate(day);
+                              Color color = Colors.grey; // デフォルト値
+                              Color textColor = Colors.black;
+                              if (level == 0.0) {
+                                color = Colors.grey; // 発射日より前の日
+                              } else if (level <= 0.2) {
+                                color = Colors.redAccent; // 低
+                              } else if (level <= 0.4) {
+                                color = Colors.yellow; // 中
+                              } else if (level <= 0.8) {
+                                color = Colors.lightGreen; // 高
+                              } else if (level == 1.0) {
+                                color = Colors.green.shade900; // ピーク
+                              }
+                              return Container(
+                                margin: const EdgeInsets.all(4.0),
+                                decoration: BoxDecoration(
+                                  color: isEjaculationDay
+                                      ? Colors.deepPurple
+                                      : color.withOpacity(0.2),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.deepPurple,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '${day.day}',
+                                    style: TextStyle(
+                                      color: isEjaculationDay
+                                          ? Colors.white
+                                          : textColor,
+                                    ),
                                   ),
                                 ),
                               );
