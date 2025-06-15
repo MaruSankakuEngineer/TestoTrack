@@ -240,9 +240,9 @@ class _MainPageState extends State<MainPage> {
                               } else if (level <= 0.4) {
                                 color = Colors.yellow; // 中
                               } else if (level <= 0.8) {
-                                color = Colors.orangeAccent; // 高
+                                color = Colors.lightGreen; // 高
                               } else if (level == 1.0) {
-                                color = Colors.green; // ピーク
+                                color = Colors.green.shade900; // ピーク
                               } else {
                                 color = Colors.orangeAccent; // 不安定
                               }
@@ -341,7 +341,8 @@ class _MainPageState extends State<MainPage> {
                                   width: 16,
                                   height: 16,
                                   decoration: BoxDecoration(
-                                    color: Colors.green.withOpacity(0.2),
+                                    color:
+                                        Colors.green.shade900.withOpacity(0.2),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -368,7 +369,7 @@ class _MainPageState extends State<MainPage> {
                                   width: 16,
                                   height: 16,
                                   decoration: BoxDecoration(
-                                    color: Colors.yellow.withOpacity(0.2),
+                                    color: Colors.lightGreen.withOpacity(0.2),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
