@@ -236,7 +236,9 @@ class _MainPageState extends State<MainPage> {
                               final level = getDopamineLevelForDate(day);
                               Color color;
                               Color textColor = Colors.black;
-                              if (level <= 0.2) {
+                              if (level == 0.0) {
+                                color = Colors.grey; // 発射日より前の日
+                              } else if (level <= 0.2) {
                                 color = Colors.redAccent; // 低
                               } else if (level <= 0.4) {
                                 color = Colors.yellow; // 中
