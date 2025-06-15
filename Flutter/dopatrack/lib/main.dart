@@ -94,14 +94,20 @@ class _MainPageState extends State<MainPage> {
 
   // ドーパミンレベル（0.0〜1.0）を計算
   double get dopamineLevel {
-    if (ejaculationDates.isEmpty) return 1.0;
+    if (ejaculationDates.isEmpty) return 0.0;
     final days = DateTime.now().difference(ejaculationDates.last).inDays;
 
-    if (days <= 1) return 0.2; // 低（Low）：Day 0-1
-    if (days <= 3) return 0.4; // 中（Medium）：Day 2-3
-    if (days <= 6) return 0.8; // 高（High）：Day 4-6
-    if (days == 7) return 1.0; // ピーク注意日（Peak）：Day 7
-    return 0.4; // Day 8以降
+    if (days <= 1) {
+      return 0.2; // 低（Low）：Day 0-1
+    } else if (days <= 4) {
+      return 0.4; // 中（Medium）：Day 2-4
+    } else if (days <= 6) {
+      return 0.8; // 高（High）：Day 5-6
+    } else if (days == 7) {
+      return 1.0; // ピーク注意日（Peak）：Day 7
+    } else {
+      return 0.4; // Day 8以降
+    }
   }
 
   // 指定日のドーパミンレベルを計算
@@ -496,6 +502,22 @@ class TestosteroneGauge extends StatelessWidget {
   final double level; // 0.0〜1.0
   const TestosteroneGauge({super.key, required this.level});
 
+  String getLevelText() {
+    if (level <= 0.2) return '低';
+    if (level <= 0.4) return '中';
+    if (level <= 0.8) return '高';
+    if (level == 1.0) return 'ピーク';
+    return '中';
+  }
+
+  Color getLevelColor() {
+    if (level <= 0.2) return Colors.redAccent;
+    if (level <= 0.4) return Colors.yellow;
+    if (level <= 0.8) return Colors.lightGreen;
+    if (level == 1.0) return Colors.green.shade900;
+    return Colors.yellow;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -508,10 +530,11 @@ class TestosteroneGauge extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '${(level * 100).toInt()}%',
-                style: const TextStyle(
+                getLevelText(),
+                style: TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
+                  color: getLevelColor(),
                 ),
               ),
               const SizedBox(height: 8),
@@ -528,6 +551,14 @@ class _GaugePainter extends CustomPainter {
   final double level;
   _GaugePainter(this.level);
 
+  Color getLevelColor() {
+    if (level <= 0.2) return Colors.redAccent;
+    if (level <= 0.4) return Colors.yellow;
+    if (level <= 0.8) return Colors.lightGreen;
+    if (level == 1.0) return Colors.green.shade900;
+    return Colors.yellow;
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
@@ -538,9 +569,7 @@ class _GaugePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 20;
     final levelPaint = Paint()
-      ..color = level < 0.33
-          ? Colors.redAccent
-          : (level < 0.66 ? Colors.orangeAccent : Colors.green)
+      ..color = getLevelColor()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 20
       ..strokeCap = StrokeCap.round;
