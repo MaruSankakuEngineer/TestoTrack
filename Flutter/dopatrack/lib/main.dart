@@ -126,14 +126,14 @@ class _MainPageState extends State<MainPage> {
     // 経過日数に基づいてドーパミンレベルを計算
     if (daysSinceEjaculation <= 1) {
       return 0.2; // 低（Low）：Day 0-1
-    } else if (daysSinceEjaculation <= 3) {
+    } else if (daysSinceEjaculation <= 4) {
       return 0.4; // 中（Medium）：Day 2-3
     } else if (daysSinceEjaculation <= 6) {
       return 0.8; // 高（High）：Day 4-6
     } else if (daysSinceEjaculation == 7) {
       return 1.0; // ピーク注意日（Peak）：Day 7
     } else {
-      return 0.6; // 不安定（Fluctuate）：Day 8以降
+      return 0.4; // 不安定（Fluctuate）：Day 8以降
     }
   }
 
@@ -235,6 +235,7 @@ class _MainPageState extends State<MainPage> {
                                   .any((date) => isSameDay(day, date));
                               final level = getDopamineLevelForDate(day);
                               Color color;
+                              Color textColor = Colors.black;
                               if (level <= 0.2) {
                                 color = Colors.redAccent; // 低
                               } else if (level <= 0.4) {
@@ -259,7 +260,7 @@ class _MainPageState extends State<MainPage> {
                                   style: TextStyle(
                                     color: isEjaculationDay
                                         ? Colors.white
-                                        : Colors.black,
+                                        : textColor,
                                     fontWeight: isEjaculationDay
                                         ? FontWeight.bold
                                         : FontWeight.normal,
@@ -358,7 +359,7 @@ class _MainPageState extends State<MainPage> {
                                   width: 16,
                                   height: 16,
                                   decoration: BoxDecoration(
-                                    color: Colors.orangeAccent.withOpacity(0.2),
+                                    color: Colors.lightGreen.withOpacity(0.2),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -369,7 +370,7 @@ class _MainPageState extends State<MainPage> {
                                   width: 16,
                                   height: 16,
                                   decoration: BoxDecoration(
-                                    color: Colors.lightGreen.withOpacity(0.2),
+                                    color: Colors.yellow.withOpacity(0.2),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
