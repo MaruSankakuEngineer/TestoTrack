@@ -235,6 +235,14 @@ class _MainPageState extends State<MainPage> {
                           lastDay: DateTime.utc(2100, 12, 31),
                           focusedDay: _focusedDay,
                           selectedDayPredicate: (day) => false,
+                          calendarFormat: CalendarFormat.month,
+                          availableCalendarFormats: const {
+                            CalendarFormat.month: '月',
+                          },
+                          headerStyle: const HeaderStyle(
+                            formatButtonVisible: false,
+                            titleCentered: true,
+                          ),
                           calendarBuilders: CalendarBuilders(
                             defaultBuilder: (context, day, focusedDay) {
                               final isEjaculationDay = ejaculationDates
