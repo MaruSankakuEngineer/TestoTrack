@@ -101,7 +101,7 @@ class _MainPageState extends State<MainPage> {
     if (days <= 3) return 0.4; // 中（Medium）：Day 2-3
     if (days <= 6) return 0.8; // 高（High）：Day 4-6
     if (days == 7) return 1.0; // ピーク注意日（Peak）：Day 7
-    return 0.6; // 不安定（Fluctuate）：Day 8以降
+    return 0.4; // Day 8以降
   }
 
   // 指定日のドーパミンレベルを計算
@@ -133,7 +133,7 @@ class _MainPageState extends State<MainPage> {
     } else if (daysSinceEjaculation == 7) {
       return 1.0; // ピーク注意日（Peak）：Day 7
     } else {
-      return 0.4; // 不安定（Fluctuate）：Day 8以降
+      return 0.4; // Day 8以降
     }
   }
 
@@ -234,7 +234,7 @@ class _MainPageState extends State<MainPage> {
                               final isEjaculationDay = ejaculationDates
                                   .any((date) => isSameDay(day, date));
                               final level = getDopamineLevelForDate(day);
-                              Color color;
+                              Color color = Colors.grey; // デフォルト値
                               Color textColor = Colors.black;
                               if (level == 0.0) {
                                 color = Colors.grey; // 発射日より前の日
@@ -246,8 +246,6 @@ class _MainPageState extends State<MainPage> {
                                 color = Colors.lightGreen; // 高
                               } else if (level == 1.0) {
                                 color = Colors.green.shade900; // ピーク
-                              } else {
-                                color = Colors.orangeAccent; // 不安定
                               }
                               return Container(
                                 decoration: BoxDecoration(
