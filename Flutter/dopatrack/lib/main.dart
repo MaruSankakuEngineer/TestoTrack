@@ -35,7 +35,6 @@ class _MainPageState extends State<MainPage> {
   final PageController _pageController = PageController();
   List<DateTime> ejaculationDates = [];
   DateTime _focusedDay = DateTime.now();
-  DateTime _selectedDay = DateTime.now();
 
   @override
   void initState() {
@@ -47,24 +46,6 @@ class _MainPageState extends State<MainPage> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
-  }
-
-  // ページを切り替える
-  void _changePage(int page) {
-    _pageController.animateToPage(
-      page,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  // ページが変更されたときの処理
-  void _onPageChanged(int page) {
-    if (page == 0) {
-      _pageController.jumpToPage(2);
-    } else if (page == 3) {
-      _pageController.jumpToPage(1);
-    }
   }
 
   // 保存された発射日を読み込む
@@ -329,7 +310,6 @@ class _MainPageState extends State<MainPage> {
                           ),
                           onDaySelected: (selectedDay, focusedDay) {
                             setState(() {
-                              _selectedDay = selectedDay;
                               _focusedDay = focusedDay;
                             });
 
@@ -567,7 +547,7 @@ class _MainPageState extends State<MainPage> {
 }
 
 class TestosteroneGauge extends StatelessWidget {
-  final double level; // 0.0〜1.0
+  final double level; // 0.0〜1.2
   const TestosteroneGauge({super.key, required this.level});
 
   String getLevelText() {
