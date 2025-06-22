@@ -92,7 +92,7 @@ class _MainPageState extends State<MainPage> {
   DateTime? get lastEjaculationDate =>
       ejaculationDates.isNotEmpty ? ejaculationDates.last : null;
 
-  // ドーパミンレベル（0.0〜1.0）を計算
+  // ドーパミンレベル（0.0〜1.2）を計算
   double get dopamineLevel {
     if (ejaculationDates.isEmpty) return 0.0;
     final days = DateTime.now().difference(ejaculationDates.last).inDays;
@@ -106,7 +106,7 @@ class _MainPageState extends State<MainPage> {
     } else if (days == 7) {
       return 1.0; // ピーク注意日（Peak）：Day 7
     } else {
-      return 0.4; // Day 8以降
+      return 1.2; // 不安定（Unstable）：Day 8以降
     }
   }
 
@@ -139,7 +139,7 @@ class _MainPageState extends State<MainPage> {
     } else if (daysSinceEjaculation == 7) {
       return 1.0; // ピーク注意日（Peak）：Day 7
     } else {
-      return 0.4; // Day 8以降
+      return 1.2; // 不安定（Unstable）：Day 8以降
     }
   }
 
@@ -260,6 +260,8 @@ class _MainPageState extends State<MainPage> {
                                 color = Colors.lightGreen; // 高
                               } else if (level == 1.0) {
                                 color = Colors.green.shade900; // ピーク
+                              } else if (level == 1.2) {
+                                color = Colors.orange; // 不安定
                               }
                               return Container(
                                 margin: const EdgeInsets.all(4.0),
@@ -297,6 +299,8 @@ class _MainPageState extends State<MainPage> {
                                 color = Colors.lightGreen; // 高
                               } else if (level == 1.0) {
                                 color = Colors.green.shade900; // ピーク
+                              } else if (level == 1.2) {
+                                color = Colors.orange; // 不安定
                               }
                               return Container(
                                 margin: const EdgeInsets.all(4.0),
@@ -465,6 +469,22 @@ class _MainPageState extends State<MainPage> {
                                 const Text('低'),
                               ],
                             ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withOpacity(0.2),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('不安定'),
+                              ],
+                            ),
                           ],
                         ),
                         const SizedBox(height: 32),
@@ -555,6 +575,7 @@ class TestosteroneGauge extends StatelessWidget {
     if (level <= 0.4) return '中';
     if (level <= 0.8) return '高';
     if (level == 1.0) return 'ピーク';
+    if (level == 1.2) return '不安定';
     return '中';
   }
 
@@ -563,6 +584,7 @@ class TestosteroneGauge extends StatelessWidget {
     if (level <= 0.4) return Colors.yellow;
     if (level <= 0.8) return Colors.lightGreen;
     if (level == 1.0) return Colors.green.shade900;
+    if (level == 1.2) return Colors.orange;
     return Colors.yellow;
   }
 
@@ -604,6 +626,7 @@ class _GaugePainter extends CustomPainter {
     if (level <= 0.4) return Colors.yellow;
     if (level <= 0.8) return Colors.lightGreen;
     if (level == 1.0) return Colors.green.shade900;
+    if (level == 1.2) return Colors.orange;
     return Colors.yellow;
   }
 
